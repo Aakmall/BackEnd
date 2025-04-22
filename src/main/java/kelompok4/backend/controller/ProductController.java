@@ -36,11 +36,19 @@ public class ProductController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody Product product) {
         return productService.update(id, product);
+
     }
+
 
     // ✅ Tambahkan method delete
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> delete(@PathVariable("id") Long id) {
         return productService.delete(id);
     }
+
+    @GetMapping("/category/{categoryId}")
+    public List<Product> getProductsByCategory(@PathVariable Long categoryId) {
+        return productService.getProductsByCategory(categoryId);
+    }
+
 }

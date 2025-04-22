@@ -10,4 +10,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "select * from product where id = ?1 and name = ?2", nativeQuery = true)
     List<Product> findByIdAndName(Long id, String name);
+
+    List<Product> findByCategoryId(Long categoryId);
+
 }

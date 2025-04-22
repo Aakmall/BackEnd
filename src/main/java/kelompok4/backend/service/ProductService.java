@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
@@ -18,6 +19,11 @@ public class ProductService {
 
     public ResponseEntity<Object> create(Product product) {
         try {
+            // Cek apakah imageBase64 ada, jika ada simpan gambar dalam format Base64
+            if (product.getImageBase64() != null && !product.getImageBase64().isEmpty()) {
+                product.setImageBase64(product.getImageBase64());
+            }
+
             Product savedProduct = productRepository.save(product);
             return ResponseEntity.ok(savedProduct);
         } catch (Exception e) {
@@ -41,6 +47,17 @@ public class ProductService {
             p.setName(product.getName());
             p.setPrice(product.getPrice());
             p.setDescription(product.getDescription());
+
+            // Update warna dan ukuran jika ada perubahan
+            p.setColor(product.getColor());
+            p.setSize(product.getSize());
+
+            // Jika ada gambar baru dalam format Base64, simpan gambar tersebut
+            if (product.getImageBase64() != null && !product.getImageBase64().isEmpty()) {
+                p.setImageBase64(product.getImageBase64());
+            }
+
+            // Simpan produk yang telah diperbarui
             productRepository.save(p);
             return ResponseEntity.ok("Product updated successfully");
         }
@@ -56,7 +73,11 @@ public class ProductService {
         return ResponseEntity.status(404).body("Product not found");
     }
 
-    // ✅ Tambahkan ini
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
+
+    // ✅ Tambahkan ini untuk menampilkan semua produk
     public List<Product> listProduct() {
         return productRepository.findAll();
     }

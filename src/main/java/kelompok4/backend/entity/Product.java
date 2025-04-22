@@ -17,6 +17,10 @@ public class Product {
     private String name;
     private Double price;
     private String description;
+    private String color;
+    private String size;
+    @Lob
+    private String imageBase64;
 
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
@@ -24,4 +28,13 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Cart> carts;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Wishlist> wishlists;
+
+
 }
