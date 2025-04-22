@@ -34,6 +34,29 @@ public class ProductService {
         }
     }
 
+    public ResponseEntity<Object> update(Long id, Product product) {
+        Optional<Product> existing = productRepository.findById(id);
+        if (existing.isPresent()) {
+            Product p = existing.get();
+            p.setName(product.getName());
+            p.setPrice(product.getPrice());
+            p.setDescription(product.getDescription());
+            productRepository.save(p);
+            return ResponseEntity.ok("Product updated successfully");
+        }
+        return ResponseEntity.status(404).body("Product not found");
+    }
+
+    public ResponseEntity<Object> delete(Long id) {
+        Optional<Product> existing = productRepository.findById(id);
+        if (existing.isPresent()) {
+            productRepository.deleteById(id);
+            return ResponseEntity.ok("Product deleted successfully");
+        }
+        return ResponseEntity.status(404).body("Product not found");
+    }
+
+    // ✅ Tambahkan ini
     public List<Product> listProduct() {
         return productRepository.findAll();
     }

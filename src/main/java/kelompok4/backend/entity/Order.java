@@ -1,7 +1,9 @@
 package kelompok4.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.Date;
 
 @Data
@@ -13,17 +15,26 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Temporal(TemporalType.TIMESTAMP)
     private Date orderDate;
 
-    private Long productId;
-
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateEstimation;
 
     private Integer quantity;
-
-    private Double totalPrice; // 💡 Simpan total price di database
+    private Double totalPrice;
+    private String status;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private Payment payment; // Relasi ke Payment
+    private Payment payment;
 
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "product_id")
+    private Product product;
 }

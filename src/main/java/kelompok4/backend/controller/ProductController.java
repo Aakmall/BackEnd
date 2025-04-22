@@ -31,4 +31,16 @@ public class ProductController {
     public List<Product> listProduct() {
         return productService.listProduct();
     }
+
+    // ✅ Tambahkan method update
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody Product product) {
+        return productService.update(id, product);
+    }
+
+    // ✅ Tambahkan method delete
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("id") Long id) {
+        return productService.delete(id);
+    }
 }

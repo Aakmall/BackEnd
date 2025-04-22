@@ -2,21 +2,17 @@ package kelompok4.backend.service;
 
 import kelompok4.backend.entity.Payment;
 import kelompok4.backend.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-
-    @Autowired
-    public PaymentService(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
 
     public Payment savePayment(Payment payment) {
         return paymentRepository.save(payment);

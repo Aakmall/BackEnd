@@ -17,6 +17,10 @@ public class Payment {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;  // ✅ Relasi baru ke User
+
     private String paymentMethod; // Contoh: Credit Card, Bank Transfer
     private Double amountPaid;
     private Date paymentDate;

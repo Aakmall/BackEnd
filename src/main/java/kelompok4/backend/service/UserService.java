@@ -31,15 +31,18 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         user.ifPresent(userRepository::delete);
     }
-    public User update(User user){
-        // check di database if user exist
-        // if exist then update
-        // else throw error
-        return null;
+    public User update(User user) {
+        Optional<User> existingUser = userRepository.findById(user.getId());
+        if (existingUser.isPresent()) {
+            User u = existingUser.get();
+            u.setName(user.getName());
+            u.setAge(user.getAge());
+            u.setEmail(user.getEmail());
+            return userRepository.save(u);
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
-    /**
-     * todo
-     * buat method update di service
-     * buat endpoint di controller
-     * */
+
+
 }
