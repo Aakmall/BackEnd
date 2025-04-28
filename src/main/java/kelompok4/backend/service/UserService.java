@@ -2,47 +2,59 @@ package kelompok4.backend.service;
 
 import kelompok4.backend.entity.User;
 import kelompok4.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public Object create(User user){
-        return userRepository.save(user);
-    }
-
-    public Object getListData(){
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Object getDataDetail(Long id){
-        return userRepository.findById(id).get();
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public void deleted(Long id){
-        Optional<User> user = userRepository.findById(id);
-        user.ifPresent(userRepository::delete);
+    public User createUser(User user) {
+        return userRepository.save(user);
     }
-    public User update(User user) {
-        Optional<User> existingUser = userRepository.findById(user.getId());
-        if (existingUser.isPresent()) {
-            User u = existingUser.get();
-            u.setName(user.getName());
-            u.setAge(user.getAge());
-            u.setEmail(user.getEmail());
-            return userRepository.save(u);
-        } else {
-            throw new RuntimeException("User not found");
+
+    public User updateUser(Long id, User user) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser != null) {
+            existingUser.setName(user.getName());
+            existingUser.setAge(user.getAge());
+            existingUser.setEmail(user.getEmail());
+            return userRepository.save(existingUser);
         }
+        return null;
     }
 
+    public User partialUpdateUser(Long id, User user) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        if (existingUser != null) {
+            if (user.getName() != null) {
+                existingUser.setName(user.getName());
+            }
+            if (user.getAge() != null) {
+                existingUser.setAge(user.getAge());
+            }
+            if (user.getEmail() != null) {
+                existingUser.setEmail(user.getEmail());
+            }
+            return userRepository.save(existingUser);
+        }
+        return null;
+    }
 
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
 }

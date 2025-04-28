@@ -25,6 +25,11 @@ public class CategoryController {
         return categoryService.createCategory(category);
     }
 
+    @PutMapping("/{id}")
+    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        return categoryService.updateCategory(id, category);
+    }
+
     @GetMapping("/{id}")
     public Category getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);

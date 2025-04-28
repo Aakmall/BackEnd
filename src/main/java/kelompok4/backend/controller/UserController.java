@@ -2,40 +2,47 @@ package kelompok4.backend.controller;
 
 import kelompok4.backend.entity.User;
 import kelompok4.backend.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/user")
-public class UserController {
-    private final UserService userService;
+import java.util.List;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+        return userService.updateUser(id, user);
+    }
+
+    @PatchMapping("/{id}")
+    public User partialUpdateUser(@PathVariable Long id, @RequestBody User user) {
+        return userService.partialUpdateUser(id, user);
     }
 
 
     @PostMapping
-    public Object create(@RequestBody User user){
-        return userService.create(user);
-    }
-
-    @GetMapping
-    public Object getListUser(){
-        return userService.getListData();
-    }
-
-    @GetMapping("/{id}")
-    public Object getDetailUser(@PathVariable("id") Long id){
-        return userService.getDataDetail(id);
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") Long id){
-        userService.deleted(id);
-    }
-
-    @PutMapping
-    public Object updateUser(@RequestBody User user){
-        return  userService.update(user);
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 }

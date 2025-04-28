@@ -19,10 +19,10 @@ public class Payment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // ✅ Relasi baru ke User
+    private User user;
 
-    private String paymentMethod; // Contoh: Credit Card, Bank Transfer
+    private String paymentMethod; // Ex: Credit Card, Bank Transfer
     private Double amountPaid;
     private Date paymentDate;
-    private String status; // Contoh: Pending, Completed, Failed
+    private String status; // Ex: Pending, Completed, Failed
 }

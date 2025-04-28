@@ -2,44 +2,42 @@ package kelompok4.backend.controller;
 
 import kelompok4.backend.entity.Cart;
 import kelompok4.backend.service.CartService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/cart")
-@RequiredArgsConstructor
+@RequestMapping("/api/carts")
+@CrossOrigin
 public class CartController {
 
-    private final CartService cartService;
-
-    @PostMapping
-    public ResponseEntity<Cart> addCart(@RequestBody Cart cart) {
-        return ResponseEntity.ok(cartService.saveCart(cart));
-    }
+    @Autowired
+    private CartService cartService;
 
     @GetMapping
-    public ResponseEntity<List<Cart>> getAllCarts() {
-        return ResponseEntity.ok(cartService.getAllCarts());
+    public List<Cart> getAllCarts() {
+        return cartService.getAllCarts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cart> getCartById(@PathVariable Long id) {
-        return cartService.getCartById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Cart getCartById(@PathVariable Long id) {
+        return cartService.getCartById(id);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Cart>> getCartsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getCartsByUserId(userId));
+    @PutMapping("/{id}")
+    public Cart updateCart(@PathVariable Long id, @RequestBody Cart cart) {
+        return cartService.updateCart(id, cart);
+    }
+
+
+    @PostMapping
+    public Cart createCart(@RequestBody Cart cart) {
+        return cartService.createCart(cart);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable Long id) {
+    public void deleteCart(@PathVariable Long id) {
         cartService.deleteCart(id);
-        return ResponseEntity.noContent().build();
     }
 }

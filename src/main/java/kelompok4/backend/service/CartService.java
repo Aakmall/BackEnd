@@ -2,33 +2,39 @@ package kelompok4.backend.service;
 
 import kelompok4.backend.entity.Cart;
 import kelompok4.backend.repository.CartRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CartService {
 
-    private final CartRepository cartRepository;
-
-    public Cart saveCart(Cart cart) {
-        return cartRepository.save(cart);
-    }
+    @Autowired
+    private CartRepository cartRepository;
 
     public List<Cart> getAllCarts() {
         return cartRepository.findAll();
     }
 
-    public Optional<Cart> getCartById(Long id) {
-        return cartRepository.findById(id);
+    public Cart getCartById(Long id) {
+        return cartRepository.findById(id).orElse(null);
     }
 
-    public List<Cart> getCartsByUserId(Long userId) {
-        return cartRepository.findByUserId(userId);
+    public Cart createCart(Cart cart) {
+        return cartRepository.save(cart);
     }
+
+    public Cart updateCart(Long id, Cart cart) {
+        Cart existingCart = cartRepository.findById(id).orElse(null);
+        if (existingCart != null) {
+            existingCart.setUser(cart.getUser());
+            existingCart.setProduct(cart.getProduct());
+            existingCart.setQuantity(cart.getQuantity());
+            return cartRepository.save(existingCart);
+        }
+        return null;
+    }
+
 
     public void deleteCart(Long id) {
         cartRepository.deleteById(id);

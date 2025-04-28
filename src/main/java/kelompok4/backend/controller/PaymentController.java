@@ -2,40 +2,42 @@ package kelompok4.backend.controller;
 
 import kelompok4.backend.entity.Payment;
 import kelompok4.backend.service.PaymentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/payments")
+@CrossOrigin
 public class PaymentController {
 
-    private final PaymentService paymentService;
-
-    @PostMapping
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
-        Payment savedPayment = paymentService.savePayment(payment);
-        return ResponseEntity.ok(savedPayment);
-    }
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping
-    public ResponseEntity<List<Payment>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+    public List<Payment> getAllPayments() {
+        return paymentService.getAllPayments();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
-        return paymentService.getPaymentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Payment getPaymentById(@PathVariable Long id) {
+        return paymentService.getPaymentById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Payment updatePayment(@PathVariable Long id, @RequestBody Payment payment) {
+        return paymentService.updatePayment(id, payment);
+    }
+
+
+    @PostMapping
+    public Payment createPayment(@RequestBody Payment payment) {
+        return paymentService.createPayment(payment);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
+    public void deletePayment(@PathVariable Long id) {
         paymentService.deletePayment(id);
-        return ResponseEntity.noContent().build();
     }
 }

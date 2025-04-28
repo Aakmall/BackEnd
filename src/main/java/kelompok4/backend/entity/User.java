@@ -16,14 +16,13 @@ public class User {
     private String name;
     private Integer age;
     private String email;
+    private String password; // ➡️ Tambahan
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Cart> carts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Wishlist> wishlists;
-
 }
+
+
