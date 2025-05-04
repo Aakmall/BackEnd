@@ -2,42 +2,60 @@ package kelompok4.backend.controller;
 
 import kelompok4.backend.entity.Product;
 import kelompok4.backend.service.ProductService;
+import kelompok4.backend.dto.CreateProductRequest;
+import kelompok4.backend.dto.ProductResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/product")
 public class ProductController {
 
+    private final ProductService productService;
+
     @Autowired
-    private ProductService productService;
-
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-    @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    // Endpoint untuk membuat produk baru
+    @PostMapping("/create")
+    public ResponseEntity<Product> createProduct(@RequestBody CreateProductRequest request) {
+        return productService.create(request); // Menggunakan ProductService untuk membuat produk
     }
 
-    @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.updateProduct(id, product);
+    // Endpoint untuk mendapatkan semua produk
+    @GetMapping("/list")
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<Product> products = productService.listProduct(); // Mengambil semua produk
+        return ResponseEntity.ok(products);
     }
 
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        // Langsung simpan produk tanpa memproses gambar
-        return productService.createProduct(product);
+    // Endpoint untuk mendapatkan detail produk berdasarkan ID
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<Product> detail(@PathVariable("id") Long id) {
+        return productService.detail(id); // Mendapatkan produk berdasarkan ID
+    }
+    // Endpoint untuk mengupdate produk berdasarkan ID
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody CreateProductRequest request) {
+        return productService.update(id, request);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+
+    // Endpoint untuk menghapus produk berdasarkan ID
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.delete(id); // Menghapus produk berdasarkan ID
+        return ResponseEntity.noContent().build(); // Mengembalikan status 204 No Content
+    }
+
+    // Endpoint untuk mendapatkan produk berdasarkan nama kategori
+    @GetMapping("/category-name/{categoryName}")
+    public ResponseEntity<List<ProductResponse>> getProductsByCategoryName(@PathVariable String categoryName) {
+        return productService.getProductsByCategoryName(categoryName); // Menggunakan ProductService untuk mengambil produk berdasarkan kategori
     }
 }

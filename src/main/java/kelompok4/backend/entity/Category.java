@@ -1,20 +1,26 @@
 package kelompok4.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "categories") // optional: ubah tabel biar lebih konsisten
+@Table(name = "category")
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // Example: "Cincin", "Kalung", etc.
+    @Column(unique = true, nullable = false)
+    private String name;
+
+    private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @JsonIgnore // Hindari circular reference saat serialisasi
     private List<Product> products;
 }

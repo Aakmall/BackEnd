@@ -1,43 +1,73 @@
 package kelompok4.backend.controller;
 
+import kelompok4.backend.dto.CartResponse;
 import kelompok4.backend.entity.Cart;
+import kelompok4.backend.entity.Product;
+import kelompok4.backend.repository.CartRepository;
 import kelompok4.backend.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/carts")
-@CrossOrigin
+@RequestMapping("/cart")
 public class CartController {
 
-    @Autowired
-    private CartService cartService;
+    private final CartService cartService;
+    private final CartRepository cartRepository;
 
-    @GetMapping
-    public List<Cart> getAllCarts() {
-        return cartService.getAllCarts();
+    @PostMapping("/add")
+    public ResponseEntity<Cart> addToCart(@RequestBody Cart cart) {
+        // Debug logging untuk memeriksa payload
+        System.out.println(">>> Received Cart Payload:");
+        if (cart.getUser() == null) {
+            System.out.println("    user: NULL");
+        } else {
+            System.out.println("    user.id: " + cart.getUser().getId());
+        }
+        if (cart.getProduct() == null) {
+            System.out.println("    product: NULL");
+        } else {
+            System.out.println("    product.id: " + cart.getProduct().getId());
+        }
+        System.out.println("    quantity: " + cart.getQuantity());
+
+        // Menambahkan produk ke keranjang
+        return cartService.addToCart(cart);
     }
 
-    @GetMapping("/{id}")
-    public Cart getCartById(@PathVariable Long id) {
-        return cartService.getCartById(id);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CartResponse>> getUserCart(@PathVariable Long userId) {
+        List<Cart> carts = cartRepository.findByUserId(userId);
+
+        List<CartResponse> response = carts.stream().map(cart -> {
+            Product product = cart.getProduct();
+            return new CartResponse(
+                    cart.getId(),
+                    cart.getQuantity(),
+                    product.getId(),
+                    product.getName(),
+                    product.getPrice(),
+                    product.getImageBase64()
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
-    public Cart updateCart(@PathVariable Long id, @RequestBody Cart cart) {
-        return cartService.updateCart(id, cart);
+    @DeleteMapping("/{cartId}")
+    public ResponseEntity<Void> removeFromCart(@PathVariable Long cartId) {
+        // Menghapus produk dari keranjang berdasarkan ID
+        return cartService.removeFromCart(cartId);
     }
 
-
-    @PostMapping
-    public Cart createCart(@RequestBody Cart cart) {
-        return cartService.createCart(cart);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteCart(@PathVariable Long id) {
-        cartService.deleteCart(id);
+    @PutMapping("/{cartId}")
+    public ResponseEntity<Cart> updateCartQuantity(@PathVariable Long cartId, @RequestParam Integer quantity) {
+        // Memperbarui jumlah produk di keranjang
+        return cartService.updateCartQuantity(cartId, quantity);
     }
 }

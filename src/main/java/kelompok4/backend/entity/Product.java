@@ -3,36 +3,38 @@ package kelompok4.backend.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Entity
-@Table(name = "products")
+@Table
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String name;
-    private Double price;
-    private String description;
-    private String color;
-    private String size;
+
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
+
+    private double price;
+
+    private Integer stock;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String imageBase64;
 
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Order> orders;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Cart> carts;
-
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
 
-
 }
+

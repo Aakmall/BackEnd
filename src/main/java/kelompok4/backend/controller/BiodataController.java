@@ -1,32 +1,33 @@
 package kelompok4.backend.controller;
 
-import kelompok4.backend.dto.BiodataDTO;
+import kelompok4.backend.entity.Biodata;
 import kelompok4.backend.service.BiodataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/biodata")
+@CrossOrigin("http://localhost:5173")
 public class BiodataController {
 
     @Autowired
-    BiodataService biodataService;
+    private BiodataService biodataService;
 
-    @GetMapping("/detail/{name}")
-    public BiodataDTO detail(@PathVariable("name") String name){
-        return biodataService.dataDiri(name);
+    @PostMapping("/add")
+    public Biodata addBiodata(@RequestBody Biodata biodata) {
+        return biodataService.save(biodata);
     }
 
     @GetMapping("/list")
-    public List<BiodataDTO> listDataDiri(){
-        return biodataService.listDataDiri();
+    public List<Biodata> getAllBiodata() {
+        return biodataService.findAll();
     }
 
-    @PostMapping("/add")
-    public List<BiodataDTO> add(@RequestBody BiodataDTO bio){
-        return biodataService.newData(bio);
+    @GetMapping("/detail/{name}")
+    public Biodata getByName(@PathVariable String name) {
+        return biodataService.findByName(name);
     }
 }
+

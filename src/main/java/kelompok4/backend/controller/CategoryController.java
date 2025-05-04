@@ -2,36 +2,35 @@ package kelompok4.backend.controller;
 
 import kelompok4.backend.entity.Category;
 import kelompok4.backend.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/categories")
-@CrossOrigin
+@RequestMapping("/category")
 public class CategoryController {
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
-    }
+    private final CategoryService categoryService;
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
+    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         return categoryService.createCategory(category);
     }
 
-    @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
-        return categoryService.updateCategory(id, category);
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryDetail(@PathVariable("id") Long id) {
+        return categoryService.getCategoryDetail(id);
     }
 
-    @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+    @GetMapping
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return categoryService.listCategories();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
+        return categoryService.deleteCategory(id);
     }
 }

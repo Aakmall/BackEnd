@@ -1,42 +1,95 @@
 package kelompok4.backend.service;
 
 import kelompok4.backend.entity.Cart;
+import kelompok4.backend.entity.Product;
+import kelompok4.backend.entity.User;
 import kelompok4.backend.repository.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import kelompok4.backend.repository.ProductRepository;
+import kelompok4.backend.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
+import java.util.List;
+import java.util.Optional;
+
+@RequiredArgsConstructor
 @Service
 public class CartService {
 
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
-    public List<Cart> getAllCarts() {
-        return cartRepository.findAll();
-    }
+    public ResponseEntity<Cart> addToCart(Cart cart) {
+        try {
+            // Validasi user dan produk
+            Optional<Product> productOptional = productRepository.findById(cart.getProduct().getId());
+            Optional<User> userOptional = userRepository.findById(cart.getUser().getId());
 
-    public Cart getCartById(Long id) {
-        return cartRepository.findById(id).orElse(null);
-    }
+            if (productOptional.isEmpty() || userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body(null);
+            }
 
-    public Cart createCart(Cart cart) {
-        return cartRepository.save(cart);
-    }
+            if (cart.getQuantity() == null || cart.getQuantity() <= 0) {
+                return ResponseEntity.badRequest().body(null);
+            }
 
-    public Cart updateCart(Long id, Cart cart) {
-        Cart existingCart = cartRepository.findById(id).orElse(null);
-        if (existingCart != null) {
-            existingCart.setUser(cart.getUser());
-            existingCart.setProduct(cart.getProduct());
-            existingCart.setQuantity(cart.getQuantity());
-            return cartRepository.save(existingCart);
+            Product product = productOptional.get();
+            User user = userOptional.get();
+
+            // Cek apakah produk sudah ada di cart user
+            Optional<Cart> existingCart = cartRepository.findByUserIdAndProductId(user.getId(), product.getId());
+            if (existingCart.isPresent()) {
+                Cart updatedCart = existingCart.get();
+                updatedCart.setQuantity(updatedCart.getQuantity() + cart.getQuantity());
+                return ResponseEntity.ok(cartRepository.save(updatedCart));
+            }
+
+            // Jika belum ada, tambahkan produk baru ke cart
+            cart.setProduct(product);
+            cart.setUser(user);
+            return ResponseEntity.ok(cartRepository.save(cart));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(null);
         }
-        return null;
+    }
+
+    public ResponseEntity<List<Cart>> getUserCart(Long userId) {
+        List<Cart> carts = cartRepository.findByUserId(userId);
+        // Pastikan produk dan pengguna di-load
+        for (Cart cart : carts) {
+            cart.getProduct().getName(); // Memastikan produk dimuat
+            cart.getProduct().getImageBase64(); // Memastikan gambar dimuat
+            cart.getProduct().getPrice(); // Memastikan harga dimuat
+        }
+        return ResponseEntity.ok(carts);
     }
 
 
-    public void deleteCart(Long id) {
-        cartRepository.deleteById(id);
+    public ResponseEntity<Void> removeFromCart(Long cartId) {
+        if (cartRepository.existsById(cartId)) {
+            cartRepository.deleteById(cartId);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    public ResponseEntity<Cart> updateCartQuantity(Long cartId, Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+        if (cartOptional.isPresent()) {
+            Cart cart = cartOptional.get();
+            cart.setQuantity(quantity);
+            return ResponseEntity.ok(cartRepository.save(cart));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

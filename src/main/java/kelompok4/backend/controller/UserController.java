@@ -3,46 +3,40 @@ package kelompok4.backend.controller;
 import kelompok4.backend.entity.User;
 import kelompok4.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
-@CrossOrigin
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
-    }
-
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
-    }
-
-    @PatchMapping("/{id}")
-    public User partialUpdateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.partialUpdateUser(id, user);
+    @PostMapping("/create")
+    public ResponseEntity<Object> createUser(@RequestBody User user) {
+        return userService.create(user);
     }
 
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    @GetMapping("/list")
+    public ResponseEntity<Object> getList() {
+        return userService.getListData();
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<Object> getDetail(@PathVariable Long id) {
+        return userService.getDataDetail(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
+        return userService.delete(id);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody User userUpdate) {
+        return userService.update(id, userUpdate);
     }
 }

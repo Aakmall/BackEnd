@@ -1,12 +1,18 @@
 package kelompok4.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "users")
+@NoArgsConstructor
+@Table(name = "user")
 public class User {
 
     @Id
@@ -14,15 +20,39 @@ public class User {
     private Long id;
 
     private String name;
+
     private Integer age;
+
+    @Email
     private String email;
-    private String password; // ➡️ Tambahan
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Cart> carts;
+    private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Biodata biodata;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "user-cart")
+    private List<Cart> cart = new ArrayList<>();
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+    }
+
+    public enum Role {
+        ADMIN,
+        USER
+    }
 }
-
-
